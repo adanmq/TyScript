@@ -1,70 +1,69 @@
+//
+// This script is designed to work within the TyFlow particle system in 3ds Max.
+// It performs the following functions for each particle in the simulation:
+//
+// 1. If it's the first time a particle is encountered, it stores the particle's current scale as its initial scale.
+//    This initial scale is used to calculate new scales based on a scaling factor.
+//
+// 2. It checks the custom float attribute 'ScaleM' for each particle. If 'ScaleM' is zero or undefined,
+//    it sets 'ScaleM' to 1 to ensure that the particle's scale is never set to zero.
+//    Otherwise, it leaves 'ScaleM' at its current value.
+//
+// 3. It then calculates a new scale for each particle by multiplying the initial scale by 'ScaleM'.
+//    This new scale is applied to the particle, effectively updating its scale in the simulation.
+//
+// Note:
+// This script assumes that the 'ScaleM' attribute is present for each particle. If 'ScaleM' is not present,
+// the script will add a custom float property named 'ScaleM' and initialize it to 1.0f.
+
 public void simulationStart()
 {
-
 }
+
+// Declare a dictionary to store the initial scales of particles.
 Dictionary<int, Point3> initialScales = new Dictionary<int, Point3>();
 
 public void simulationStep()
 {
+    // Iterate over all the particles in the current event.
     for (int i = 0; i < eventParticleCount; i++)
     {
+        // Get the simulation index of the current particle.
         int sInx = tf.GetSimIndex(i);
+
+        // Check if the initial scale has already been stored for this particle.
+        // If not, store the current scale as the initial scale.
         if (!initialScales.ContainsKey(sInx))
         {
             Point3 currentScale = tf.GetScale(sInx);
             initialScales[sInx] = currentScale;
         }
 
+        // Retrieve the value of the custom float 'ScaleM' for the current particle.
         float scaleMValue = tf.GetCustomFloat(sInx, "ScaleM");
+
+        // If 'ScaleM' is zero, set it to 1 to ensure the particle's scale is not zero.
         if (scaleMValue == 0)
         {
             scaleMValue = 1.0f;
             tf.SetCustomFloat(sInx, "ScaleM", scaleMValue);
         }
 
+        // Retrieve the initial scale from the dictionary.
         Point3 initialScale = initialScales[sInx];
+
+        // Calculate the new scale by multiplying the initial scale by 'ScaleM'.
         Point3 newScale = new Point3(initialScale.x * scaleMValue, initialScale.y * scaleMValue, initialScale.z * scaleMValue);
+
+        // Apply the new scale to the particle.
         tf.SetScale(sInx, newScale);
     }
 }
 
 public void simulationStepThreaded(int startInx, int endInx, int threadInx)					
 {
-	/*
-	This function allows for multi-threaded particle 
-	scripting. It is disabled by default. To switch to threaded 
-	mode, call 'tf.SetThreaded(true);' in 'simulationStart'.
-
-	The arguments 'startInx' and 'endInx' point to the start
-	and end index of a chunk of event particles that each 
-	thread will process in parallel.
-
-	The argument 'threadInx' is the index of the current thread.
-
-	If you want to have simulationStepThreaded evaluate multiple
-	times in the same time step (ex: you are multithreading an 
-	iterative solver), you can call tf.SetThreadedIterations(n) to
-	set the number of times the threads will re-evaluate this function.
-	The iterator will wait for all threads to complete their tasks 
-	before starting the next iteration. tf.GetThreadedIteration() 
-	can	be called to determine the current iteration of the 
-	iteration loop.
-
-	Please make sure you understand the limits of 
-	multithreading in 3dsmax before enabling this feature!						
-	*/
 }
 
 public void postSimulationStep()
 {
-	/*
-	This single-threaded function is called after simulationStep and 
-	simulationStepThreaded. Its main purpose is to provide a place 
-	to process and synchronize data collected by multiple threads 
-	after the call to simulationStepThreaded is complete.
-	*/
 }
-
-
-//__END__
-
