@@ -58,27 +58,4 @@ public void simulationStep()
 
 public void simulationStepThreaded(int startInx, int endInx, int threadInx)					
 {
-	/*
-	This function allows for multi-threaded particle 
-	scripting. It is disabled by default. To switch to threaded 
-	mode, call 'tf.SetThreaded(true);' in 'simulationStart'.
-
-	The arguments 'startInx' and 'endInx' point to the start
-	and end index of a chunk of event particles that each 
-	thread will process in parallel.
-
-	The argument 'threadInx' is the index of the current thread.
-
-	If you want to have simulationStepThreaded evaluate multiple
-	times in the same time step (ex: you are multithreading an 
-	iterative solver), you can call tf.SetThreadedIterations(n) to
-	set the number of times the threads will re-evaluate this function.
-	The iterator will wait for all threads to complete their tasks 
-	before starting the next iteration. tf.GetThreadedIteration() 
-	can	be called to determine the current iteration of the 
-	iteration loop.
-
-	Please make sure you understand the limits of 
-	multithreading in 3dsmax before enabling this feature!						
-	*/
 }
