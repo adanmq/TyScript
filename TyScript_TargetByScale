@@ -4,42 +4,54 @@ public void simulationStart()
 
 public void simulationStep()
 {
+    // Retrieve scale limit values from the environment or settings.
     float lowerScaleLimit = GetFloat("LowerScaleLimit");
     float upperScaleLimit = GetFloat("UpperScaleLimit");
     
+    // Initialize all particles with a customID of -1.
     for (int i = 0; i < eventParticleCount; i++)
     {
         int sInx = tf.GetSimIndex(i);
         tf.SetCustomFloat(sInx, "customID", -1);
     }
 
+    // Structure to store scale magnitudes and simulation indices within the limits.
     List<Tuple<float, int>> particleScales = new List<Tuple<float, int>>();
 
+    // Collect scale magnitudes and simulation indices if they meet the scale limits.
     for (int i = 0; i < eventParticleCount; i++)
     {
         int sInx = tf.GetSimIndex(i);
         Point3 scale = tf.GetScale(sInx);
         float magnitude = scale.magnitude;
 
+        // Check if the scale magnitude is within the established limits.
         if ((magnitude >= lowerScaleLimit) && (upperScaleLimit == 0 || magnitude <= upperScaleLimit))
         {
             particleScales.Add(new Tuple<float, int>(magnitude, sInx));
         }
     }
 
+    // Sort by scale magnitude in descending order.
     particleScales.Sort((a, b) => b.Item1.CompareTo(a.Item1));
 
+    // Get the starting ID from the "StartID" float defined in the script operator.
     float startID = GetFloat("StartID");
+    
+    // Get the number of targets from the "NumTargets" float.
     float numTargets = GetFloat("NumTargets");
 
+    // Calculate the number of particles that will be assigned to each target.
     int particlesPerTarget = eventParticleCount / (int)numTargets;
     int remainder = eventParticleCount % (int)numTargets;
 
-    int counter = 0;
+    // Assign custom IDs based on the new order and the starting ID.
+    int counter = 0; // Counter for assigning extra particles to the first groups.
     for (int i = 0; i < particleScales.Count; i++)
     {
         int sInx = particleScales[i].Item2;
         
+        // Calculate the custom ID based on group size and remainder.
         float customID;
         if (counter < remainder)
         {
@@ -52,6 +64,7 @@ public void simulationStep()
             customID = startID + (float)((i - counter) / particlesPerTarget);
         }
         
+        // Set the custom ID for the particle.
         tf.SetCustomFloat(sInx, "customID", customID);
     }
 }
