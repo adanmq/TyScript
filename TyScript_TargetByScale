@@ -1,0 +1,84 @@
+public void simulationStart()
+{
+}
+
+public void simulationStep()
+{
+    float lowerScaleLimit = GetFloat("LowerScaleLimit");
+    float upperScaleLimit = GetFloat("UpperScaleLimit");
+    
+    for (int i = 0; i < eventParticleCount; i++)
+    {
+        int sInx = tf.GetSimIndex(i);
+        tf.SetCustomFloat(sInx, "customID", -1);
+    }
+
+    List<Tuple<float, int>> particleScales = new List<Tuple<float, int>>();
+
+    for (int i = 0; i < eventParticleCount; i++)
+    {
+        int sInx = tf.GetSimIndex(i);
+        Point3 scale = tf.GetScale(sInx);
+        float magnitude = scale.magnitude;
+
+        if ((magnitude >= lowerScaleLimit) && (upperScaleLimit == 0 || magnitude <= upperScaleLimit))
+        {
+            particleScales.Add(new Tuple<float, int>(magnitude, sInx));
+        }
+    }
+
+    particleScales.Sort((a, b) => b.Item1.CompareTo(a.Item1));
+
+    float startID = GetFloat("StartID");
+    float numTargets = GetFloat("NumTargets");
+
+    int particlesPerTarget = eventParticleCount / (int)numTargets;
+    int remainder = eventParticleCount % (int)numTargets;
+
+    int counter = 0;
+    for (int i = 0; i < particleScales.Count; i++)
+    {
+        int sInx = particleScales[i].Item2;
+        
+        float customID;
+        if (counter < remainder)
+        {
+            customID = startID + (float)(i / (particlesPerTarget + 1));
+            if (i % (particlesPerTarget + 1) == 0 && i != 0)
+                counter++;
+        }
+        else
+        {
+            customID = startID + (float)((i - counter) / particlesPerTarget);
+        }
+        
+        tf.SetCustomFloat(sInx, "customID", customID);
+    }
+}
+
+public void simulationStepThreaded(int startInx, int endInx, int threadInx)					
+{
+	/*
+	This function allows for multi-threaded particle 
+	scripting. It is disabled by default. To switch to threaded 
+	mode, call 'tf.SetThreaded(true);' in 'simulationStart'.
+
+	The arguments 'startInx' and 'endInx' point to the start
+	and end index of a chunk of event particles that each 
+	thread will process in parallel.
+
+	The argument 'threadInx' is the index of the current thread.
+
+	If you want to have simulationStepThreaded evaluate multiple
+	times in the same time step (ex: you are multithreading an 
+	iterative solver), you can call tf.SetThreadedIterations(n) to
+	set the number of times the threads will re-evaluate this function.
+	The iterator will wait for all threads to complete their tasks 
+	before starting the next iteration. tf.GetThreadedIteration() 
+	can	be called to determine the current iteration of the 
+	iteration loop.
+
+	Please make sure you understand the limits of 
+	multithreading in 3dsmax before enabling this feature!						
+	*/
+}
