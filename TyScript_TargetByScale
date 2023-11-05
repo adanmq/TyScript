@@ -1,3 +1,32 @@
+// TyFlow Script Description:
+//
+// This script sorts particles within a TyFlow event based on their scale magnitude and assigns them a custom ID.
+// It's intended to organize particles into different target groups for further operations within the simulation.
+//
+// Steps performed by this script:
+// 1. Retrieves lower and upper scale limit values, which define the range of scale magnitudes to consider.
+// 2. Initializes all particles with a default custom ID of -1 to signify they have not been processed yet.
+// 3. Collects the scale magnitudes of particles that fall within the defined limits and stores them along with their simulation indices.
+// 4. Sorts the collected particles in descending order based on their scale magnitude.
+// 5. Calculates and assigns a new custom ID to each particle based on its sorted position, ensuring that particles are grouped 
+//    and identified according to their relative size within the simulation.
+//
+// The script operates under the following assumptions:
+// - 'LowerScaleLimit' and 'UpperScaleLimit' are defined and accessible as floats within the script's environment.
+// - 'StartID' is the initial value for custom IDs and is incremented as new IDs are assigned to sorted particles.
+// - 'NumTargets' determines the number of groups into which particles will be divided.
+// - Particles are evenly distributed among the targets, with the remainder being distributed to the first groups.
+//
+// Variables used in the script:
+// - lowerScaleLimit: The minimum scale magnitude for particles to be included in the sorting process.
+// - upperScaleLimit: The maximum scale magnitude for particles to be included in the sorting process.
+// - particleScales: A list that holds tuples of particle scale magnitudes and their corresponding simulation indices.
+// - startID: The starting point for custom ID assignment.
+// - numTargets: The number of distinct groups or targets for particle assignment.
+// - particlesPerTarget: The calculated number of particles per target.
+// - remainder: The number of particles that don't fit evenly into the target groups.
+// - counter: Used to distribute the remainder particles across the first few groups.
+
 public void simulationStart()
 {
 }
@@ -70,5 +99,9 @@ public void simulationStep()
 }
 
 public void simulationStepThreaded(int startInx, int endInx, int threadInx)					
+{
+}
+
+public void postSimulationStep()
 {
 }
